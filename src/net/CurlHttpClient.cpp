@@ -44,10 +44,9 @@ std::string CurlHttpClient::makeRequest(const Url& url, const std::vector<HttpRe
     CURL* curl = getCurlHandle(this);
 
     curl_easy_reset(curl);
-
-    curl_easy_setopt(curl, CURLOPT_PROXY, _proxyUrl);
     curl_easy_setopt(curl, CURLOPT_CONNECTTIMEOUT, _connectTimeout);
     curl_easy_setopt(curl, CURLOPT_TIMEOUT, _timeout);
+    curl_easy_setopt(curl, CURLOPT_PROXY, _proxyUrl);
 
     std::string u = url.protocol + "://" + url.host + url.path;
     if (args.empty()) {
