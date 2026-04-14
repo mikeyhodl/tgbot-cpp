@@ -47,8 +47,19 @@ public:
      */
     std::mutex curlHandlesMutex;
 
+    /**
+     * @brief Proxy URL (NULL = no proxy).
+     */
+    void setProxy(const char* url = NULL, long timeout = 20L) {
+	_proxyUrl = url;
+	_connectTimeout = timeout;
+    }
+
 private:
     const HttpParser _httpParser;
+    const char* _proxyUrl = NULL;
+    long _connectTimeout = 20L;
+
 };
 
 }
