@@ -12,6 +12,8 @@
 #include "tgbot/types/PollAnswer.h"
 #include "tgbot/types/ChatMemberUpdated.h"
 #include "tgbot/types/ChatJoinRequest.h"
+#include "tgbot/types/MessageReactionUpdated.h"
+#include "tgbot/types/MessageReactionCountUpdated.h"
 #include "tgbot/types/SuccessfulPayment.h"
 
 #include <functional>
@@ -44,6 +46,8 @@ public:
     typedef std::function<void (const PollAnswer::Ptr)> PollAnswerListener;
     typedef std::function<void (const ChatMemberUpdated::Ptr)> ChatMemberUpdatedListener;
     typedef std::function<void (const ChatJoinRequest::Ptr)> ChatJoinRequestListener;
+    typedef std::function<void (const MessageReactionUpdated::Ptr)> MessageReactionUpdatedListener;
+    typedef std::function<void (const MessageReactionCountUpdated::Ptr)> MessageReactionCountUpdatedListener;
     typedef std::function<void (const Message::Ptr, const SuccessfulPayment::Ptr)> SuccessfulPaymentListener;
 
     /**
@@ -205,6 +209,22 @@ public:
     }
 
     /**
+     * @brief Registers listener which receives new incoming message reaction update event.
+     * @param listener Listener.
+     */
+    inline void onMessageReaction(const MessageReactionUpdatedListener& listener) {
+        _onMessageReactionUpdatedListener.push_back(listener);
+    }
+
+    /**
+     * @brief Registers listener which receives new incoming message reaction count update event.
+     * @param listener Listener.
+     */
+    inline void onMessageReactionCount(const MessageReactionCountUpdatedListener& listener) {
+        _onMessageReactionCountUpdatedListener.push_back(listener);
+    }
+
+    /**
     * @brief Registers listener which receives information about successful payments.
     * This listener is triggered when a successful payment is received by the bot.
     * 
@@ -293,6 +313,14 @@ private:
         broadcast<ChatJoinRequestListener, ChatJoinRequest::Ptr>(_onChatJoinRequestListeners, result);
     }
 
+    inline void broadcastMessageReactionUpdated(const MessageReactionUpdated::Ptr& messageReaction) const {
+        broadcast<MessageReactionUpdatedListener, MessageReactionUpdated::Ptr>(_onMessageReactionUpdatedListener, messageReaction);
+    }
+
+    inline void broadcastMessageReactionCountUpdated(const MessageReactionCountUpdated::Ptr& messageReactionCount) const {
+        broadcast<MessageReactionCountUpdatedListener, MessageReactionCountUpdated::Ptr>(_onMessageReactionCountUpdatedListener, messageReactionCount);
+    }
+
     inline void broadcastSuccessfulPayment(const Message::Ptr& message) const {
         if (!message || !message->successfulPayment) {
             return;
@@ -318,6 +346,8 @@ private:
     std::vector<ChatMemberUpdatedListener> _onMyChatMemberListeners;
     std::vector<ChatMemberUpdatedListener> _onChatMemberListeners;
     std::vector<ChatJoinRequestListener> _onChatJoinRequestListeners;
+    std::vector<MessageReactionUpdatedListener> _onMessageReactionUpdatedListener;
+    std::vector<MessageReactionCountUpdatedListener> _onMessageReactionCountUpdatedListener;
     std::vector<SuccessfulPaymentListener> _onSuccessfulPaymentListeners;
 
 };
